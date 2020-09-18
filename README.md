@@ -25,16 +25,12 @@ BufferedCounter.add(pid, 2)
 # 111 immediately due to threshold
 
 BufferedCounter.add(pid, 2)
-<<<<<<< HEAD
-# 113 after 5s due to timeout
-=======
 Process.sleep(5000)
 # 113 after 5s due to timeout
 
 BufferedCounter.add(pid, -8)
 BufferedCounter.flush(pid)
 # 105 due to flush
->>>>>>> README
 ```
 
 ## BufferedQueue
@@ -47,14 +43,10 @@ BufferedQueue.enqueue(pid, [2, 3])
 # [1, 2, 3] immediately due to size
 
 BufferedQueue.enqueue(pid, [4])
-<<<<<<< HEAD
-# [4] after 5s due to timeout
-=======
 Process.sleep(5000)
 # [4] after 5s due to timeout
 
 BufferedQueue.enqueue(pid, [5])
 BufferedQueue.flush(pid)
-# [5] after 5s due to timeout
->>>>>>> README
+# [5] due to flush
 ```
