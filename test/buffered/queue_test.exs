@@ -2,10 +2,13 @@ defmodule Buffered.QueueTest do
   use ExUnit.Case, async: true
   alias Buffered.Queue
 
+  @timeout 300
+
   setup do
     this = self()
 
-    {:ok, pid} = Queue.start_link(%{size: 2, timeout: 100}, fn items -> send(this, items) end)
+    {:ok, pid} =
+      Queue.start_link(%{size: 2, timeout: @timeout}, fn items -> send(this, items) end)
 
     {:ok, %{pid: pid}}
   end
@@ -37,7 +40,7 @@ defmodule Buffered.QueueTest do
     Queue.enqueue(pid, [1])
     refute_receive([1])
 
-    Process.sleep(100)
+    Process.sleep(@timeout)
     assert_receive([1])
 
     Queue.enqueue(pid, [4, 5])

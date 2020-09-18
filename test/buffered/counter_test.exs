@@ -2,11 +2,13 @@ defmodule Buffered.CounterTest do
   use ExUnit.Case, async: true
   alias Buffered.Counter
 
+  @timeout 300
+
   setup do
     this = self()
 
     {:ok, pid} =
-      Counter.start_link(%{start: 100, threshold: 10, timeout: 100}, fn n ->
+      Counter.start_link(%{start: 100, threshold: 10, timeout: @timeout}, fn n ->
         send(this, n)
       end)
 
@@ -35,7 +37,7 @@ defmodule Buffered.CounterTest do
     Counter.add(pid, 9)
     refute_receive(109)
 
-    Process.sleep(100)
+    Process.sleep(@timeout)
     assert_receive(109)
   end
 
