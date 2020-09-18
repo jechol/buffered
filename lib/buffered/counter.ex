@@ -6,7 +6,7 @@ defmodule Buffered.Counter do
   # Interface
   def start_link(
         %{start: start, threshold: threshold, timeout: timeout},
-        flush_callback,
+        flush_cb,
         opts \\ []
       ) do
     Buffered.start_link(
@@ -14,7 +14,7 @@ defmodule Buffered.Counter do
         identity: 0,
         threshold: threshold,
         timeout: timeout,
-        flush_callback: flush_callback,
+        flush_cb: flush_cb,
         private: %Private{
           last_number: start,
           change: 0
