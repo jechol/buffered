@@ -4,7 +4,7 @@ defmodule Buffered.MixProject do
   def project do
     [
       app: :buffered,
-      version: "0.2.1",
+      version: "0.3.0",
       elixir: ">= 1.7.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -25,7 +25,7 @@ defmodule Buffered.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, "~> 0.22.0", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21.0", only: :dev, runtime: false}
     ]
   end
 

@@ -13,7 +13,7 @@ by adding `buffered` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:buffered, "~> 0.2.1"}
+    {:buffered, "~> 0.3.0"}
   ]
 end
 ```
@@ -57,3 +57,11 @@ Counter.add(pid, -8)
 Counter.flush(pid)
 # 105 due to flush
 ```
+
+### How to extend?
+
+Both of `Buffered.Counter`, `Buffered.Queue` are just customization of `Buffered`.
+
+Defining `append/2`, `overflow?/1`, `reset/1` for your own data is enough.
+
+See how `Buffered.Queue` is implemented [here](https://github.com/jechol/buffered/blob/master/lib/buffered/queue.ex).
