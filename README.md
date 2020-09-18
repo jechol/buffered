@@ -13,7 +13,7 @@ by adding `buffered` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:buffered, "~> 0.2.0"}
+    {:buffered, "~> 0.2.1"}
   ]
 end
 ```
