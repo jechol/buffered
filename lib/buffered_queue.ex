@@ -67,8 +67,7 @@ defmodule BufferedQueue do
     new_buffer_filled = length(new_items) + buffer.filled
 
     if new_buffer_filled >= buffer.size do
-      {:empty, %Buffer{buffer | items: [], filled: 0},
-       (buffer.items ++ new_items) |> Enum.chunk_every(buffer.size)}
+      {:empty, %Buffer{buffer | items: [], filled: 0}, [buffer.items ++ new_items]}
     else
       {:buffering, %Buffer{buffer | items: buffer.items ++ new_items, filled: new_buffer_filled},
        []}
@@ -76,9 +75,7 @@ defmodule BufferedQueue do
   end
 
   defp __handle_flush_event(%Buffer{} = buffer) do
-    buffer.items
-    |> Enum.chunk_every(buffer.size)
-    |> Enum.each(buffer.flush_callback)
+    buffer.flush_callback.(buffer.items)
 
     {:next_state, :empty, %Buffer{buffer | items: [], filled: 0}}
   end
