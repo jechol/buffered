@@ -28,7 +28,7 @@ defmodule BufferedQueue do
   end
 
   def init(data) do
-    {:ok, :empty, data}
+    {:ok, :idle, data}
   end
 
   # State callbacks
@@ -50,11 +50,11 @@ defmodule BufferedQueue do
     __handle_flush_event(buffer) |> Tuple.append({:reply, from, :ok})
   end
 
-  def handle_event(:enter, :empty, :buffering, %Buffer{timeout: timeout}) do
+  def handle_event(:enter, :idle, :buffering, %Buffer{timeout: timeout}) do
     {:keep_state_and_data, {:state_timeout, timeout, :flush}}
   end
 
-  def handle_event(:enter, _, :empty, _) do
+  def handle_event(:enter, _, :idle, _) do
     :keep_state_and_data
   end
 
@@ -67,7 +67,7 @@ defmodule BufferedQueue do
     new_buffer_filled = length(new_items) + buffer.filled
 
     if new_buffer_filled >= buffer.size do
-      {:empty, %Buffer{buffer | items: [], filled: 0}, [buffer.items ++ new_items]}
+      {:idle, %Buffer{buffer | items: [], filled: 0}, [buffer.items ++ new_items]}
     else
       {:buffering, %Buffer{buffer | items: buffer.items ++ new_items, filled: new_buffer_filled},
        []}
@@ -77,6 +77,6 @@ defmodule BufferedQueue do
   defp __handle_flush_event(%Buffer{} = buffer) do
     buffer.flush_callback.(buffer.items)
 
-    {:next_state, :empty, %Buffer{buffer | items: [], filled: 0}}
+    {:next_state, :idle, %Buffer{buffer | items: [], filled: 0}}
   end
 end
