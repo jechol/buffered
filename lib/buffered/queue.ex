@@ -1,4 +1,4 @@
-defmodule TimeoutBuffer do
+defmodule Buffered.Queue do
   @behaviour :gen_statem
 
   defmodule Buffer do
@@ -38,31 +38,31 @@ defmodule TimeoutBuffer do
   end
 
   def handle_event({:call, from}, {:enqueue, new_items}, _, %Buffer{} = buffer) do
-    buffer
-    |> __enqueue(new_items)
-    |> case do
-      {:empty, new_buffer, flush_list} ->
-        flush_list |> Enum.each(buffer.flush)
-        {:next_state, :empty, new_buffer, {:reply, from, :ok}}
+    {next_state, new_buffer, flush_list} =
+      buffer
+      |> __enqueue(new_items)
 
-      {:buffering, new_buffer} ->
-        {:next_state, :buffering, new_buffer, {:reply, from, :ok}}
-    end
+    flush_list |> Enum.each(buffer.flush)
+    {:next_state, next_state, new_buffer, {:reply, from, :ok}}
+  end
+
+  def handle_event({:call, from}, :flush, _, %Buffer{} = buffer) do
+    __flush(buffer) |> Tuple.append({:reply, from, :ok})
   end
 
   def handle_event(:enter, :empty, :buffering, %Buffer{timeout: timeout}) do
     {:keep_state_and_data, {:state_timeout, timeout, :flush}}
   end
 
-  def handle_event(:enter, _, _, _) do
+  def handle_event(:enter, :buffering, :empty, _) do
     :keep_state_and_data
   end
 
   def handle_event(:state_timeout, :flush, :buffering, %Buffer{} = buffer) do
-    buffer.flush.(buffer.items)
-    {:next_state, :empty, %Buffer{buffer | items: [], filled: 0}}
+    __flush(buffer)
   end
 
+  # Private
   defp __enqueue(%Buffer{} = buffer, new_items) when is_list(new_items) do
     new_buffer_filled = length(new_items) + buffer.filled
 
@@ -70,7 +70,16 @@ defmodule TimeoutBuffer do
       {:empty, %Buffer{buffer | items: [], filled: 0},
        (buffer.items ++ new_items) |> Enum.chunk_every(buffer.size)}
     else
-      {:buffering, %Buffer{buffer | items: buffer.items ++ new_items, filled: new_buffer_filled}}
+      {:buffering, %Buffer{buffer | items: buffer.items ++ new_items, filled: new_buffer_filled},
+       []}
     end
+  end
+
+  defp __flush(%Buffer{} = buffer) do
+    buffer.items
+    |> Enum.chunk_every(buffer.size)
+    |> Enum.each(buffer.flush)
+
+    {:next_state, :empty, %Buffer{buffer | items: [], filled: 0}}
   end
 end
