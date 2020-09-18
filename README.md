@@ -20,25 +20,6 @@ end
 
 ## Usage
 
-### BufferedCounter
-
-```elixir
-alias Buffered.Counter
-{:ok, pid} = Counter.start_link(%{start: 100, threshold: 10, timeout: 3000}, &IO.inspect/1)
-
-Counter.add(pid, 9)
-Counter.add(pid, 2)
-# 111 immediately as change 11 > threshold 10
-
-Counter.add(pid, 2)
-Process.sleep(5000)
-# 113 as ellapsed time 5000ms > timeout 3000ms
-
-Counter.add(pid, -8)
-Counter.flush(pid)
-# 105 due to flush
-```
-
 ### Queue
 
 ```elixir
@@ -56,4 +37,23 @@ Process.sleep(5000)
 Queue.enqueue(pid, [5])
 Queue.flush(pid)
 # [5] due to flush
+```
+
+### Counter
+
+```elixir
+alias Buffered.Counter
+{:ok, pid} = Counter.start_link(%{start: 100, threshold: 10, timeout: 3000}, &IO.inspect/1)
+
+Counter.add(pid, 9)
+Counter.add(pid, 2)
+# 111 immediately as change 11 > threshold 10
+
+Counter.add(pid, 2)
+Process.sleep(5000)
+# 113 as ellapsed time 5000ms > timeout 3000ms
+
+Counter.add(pid, -8)
+Counter.flush(pid)
+# 105 due to flush
 ```
