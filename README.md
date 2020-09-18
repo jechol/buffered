@@ -1,3 +1,6 @@
+![mix test](https://github.com/jechol/buffered/workflows/mix%20test/badge.svg)
+![Hex.pm](https://img.shields.io/hexpm/v/buffered)
+
 # Buffered
 
 Buffered queue and counter for Erlang/Elixir
