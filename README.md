@@ -24,15 +24,15 @@ end
 
 ```elixir
 alias Buffered.Counter
-{:ok, pid} = Counter.start_link(%{start: 100, threshold: 10, timeout: 5000}, &IO.inspect/1)
+{:ok, pid} = Counter.start_link(%{start: 100, threshold: 10, timeout: 3000}, &IO.inspect/1)
 
 Counter.add(pid, 9)
 Counter.add(pid, 2)
-# 111 immediately due to threshold
+# 111 immediately as change 11 > threshold 10
 
 Counter.add(pid, 2)
 Process.sleep(5000)
-# 113 after 5s due to timeout
+# 113 as ellapsed time 5000ms > timeout 3000ms
 
 Counter.add(pid, -8)
 Counter.flush(pid)
@@ -43,15 +43,15 @@ Counter.flush(pid)
 
 ```elixir
 alias Buffered.Queue
-{:ok, pid} = Queue.start_link(%{size: 2, timeout: 5000}, &IO.inspect/1)
+{:ok, pid} = Queue.start_link(%{size: 2, timeout: 3000}, &IO.inspect/1)
 
 Queue.enqueue(pid, [1])
 Queue.enqueue(pid, [2, 3])
-# [1, 2, 3] immediately due to size
+# [1, 2, 3] immediately as size of [1, 2, 3] > size 2
 
 Queue.enqueue(pid, [4])
 Process.sleep(5000)
-# [4] after 5s due to timeout
+# [4] as ellapsed time 5000ms > timeout 3000ms
 
 Queue.enqueue(pid, [5])
 Queue.flush(pid)
