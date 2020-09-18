@@ -2,14 +2,14 @@ defmodule Buffered.Queue do
   @behaviour :gen_statem
 
   defmodule Data do
-    defstruct items: [], filled: 0, size: 0, timeout: 0, flush_callback: nil
+    defstruct items: [], filled: 0, threshold: 0, timeout: 0, flush_callback: nil
   end
 
   # Interface
-  def start_link(%{size: size, timeout: timeout}, flush_callback, opts \\ []) do
+  def start_link(%{size: threshold, timeout: timeout}, flush_callback, opts \\ []) do
     :gen_statem.start_link(
       __MODULE__,
-      %Data{size: size, timeout: timeout, flush_callback: flush_callback},
+      %Data{threshold: threshold, timeout: timeout, flush_callback: flush_callback},
       opts
     )
   end
@@ -66,7 +66,7 @@ defmodule Buffered.Queue do
   defp __enqueue(%Data{} = data, new_items) when is_list(new_items) do
     new_buffer_filled = length(new_items) + data.filled
 
-    if new_buffer_filled >= data.size do
+    if new_buffer_filled >= data.threshold do
       {:idle, %Data{data | items: [], filled: 0}, [data.items ++ new_items]}
     else
       {:buffering, %Data{data | items: data.items ++ new_items, filled: new_buffer_filled}, []}
