@@ -30,11 +30,6 @@ defmodule Buffered.Counter do
     )
   end
 
-  def add(pid, change) do
-    Buffered.append(pid, change)
-  end
-
-  def flush(pid) do
-    Buffered.flush(pid)
-  end
+  defdelegate add(pid, change), to: Buffered, as: :append
+  defdelegate flush(pid), to: Buffered
 end

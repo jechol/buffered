@@ -26,11 +26,6 @@ defmodule Buffered.Queue do
     )
   end
 
-  def enqueue(pid, new_items) do
-    Buffered.append(pid, new_items)
-  end
-
-  def flush(pid) do
-    Buffered.flush(pid)
-  end
+  defdelegate enqueue(pid, new_items), to: Buffered, as: :append
+  defdelegate flush(pid), to: Buffered
 end
