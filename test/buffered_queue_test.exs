@@ -1,5 +1,5 @@
 defmodule BufferedQueueTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   setup do
     this = self()

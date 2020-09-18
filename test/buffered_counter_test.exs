@@ -17,6 +17,11 @@ defmodule BufferedCounterTest do
     assert_receive(111)
   end
 
+  test "idle -> idle for negative", %{pid: pid} do
+    BufferedCounter.add(pid, -11)
+    assert_receive(89)
+  end
+
   test "idle -> buffering -> idle", %{pid: pid} do
     BufferedCounter.add(pid, 9)
     BufferedCounter.add(pid, 2)
