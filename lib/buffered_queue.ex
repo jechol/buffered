@@ -34,7 +34,7 @@ defmodule BufferedQueue do
   # State callbacks
   def handle_event({:call, from}, {:enqueue, []}, _state, _buffer) do
     # Ignore void enqueue
-    {:keep_state_and_data, [{:reply, from, :ok}]}
+    {:keep_state_and_data, {:reply, from, :ok}}
   end
 
   def handle_event({:call, from}, {:enqueue, new_items}, _, %Buffer{} = buffer) do
