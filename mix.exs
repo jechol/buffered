@@ -3,7 +3,7 @@ defmodule TimeoutBuffer.MixProject do
 
   def project do
     [
-      app: :timeout_buffer,
+      app: :buffered,
       version: "0.1.0",
       elixir: ">= 1.6.0",
       start_permanent: Mix.env() == :prod,

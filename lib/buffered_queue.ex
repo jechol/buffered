@@ -1,15 +1,15 @@
-defmodule Buffered.Queue do
+defmodule BufferedQueue do
   @behaviour :gen_statem
 
   defmodule Buffer do
-    defstruct items: [], filled: 0, size: 0, timeout: 0, flush: nil
+    defstruct items: [], filled: 0, size: 0, timeout: 0, flush_callback: nil
   end
 
   # Interface
-  def start_link(size, timeout, flush, opts \\ []) do
+  def start_link(size, timeout, flush_callback, opts \\ []) do
     :gen_statem.start_link(
       __MODULE__,
-      %Buffer{size: size, timeout: timeout, flush: flush},
+      %Buffer{size: size, timeout: timeout, flush_callback: flush_callback},
       opts
     )
   end
@@ -42,24 +42,24 @@ defmodule Buffered.Queue do
       buffer
       |> __enqueue(new_items)
 
-    flush_list |> Enum.each(buffer.flush)
+    flush_list |> Enum.each(buffer.flush_callback)
     {:next_state, next_state, new_buffer, {:reply, from, :ok}}
   end
 
   def handle_event({:call, from}, :flush, _, %Buffer{} = buffer) do
-    __flush(buffer) |> Tuple.append({:reply, from, :ok})
+    __handle_flush_event(buffer) |> Tuple.append({:reply, from, :ok})
   end
 
   def handle_event(:enter, :empty, :buffering, %Buffer{timeout: timeout}) do
     {:keep_state_and_data, {:state_timeout, timeout, :flush}}
   end
 
-  def handle_event(:enter, :buffering, :empty, _) do
+  def handle_event(:enter, _, :empty, _) do
     :keep_state_and_data
   end
 
   def handle_event(:state_timeout, :flush, :buffering, %Buffer{} = buffer) do
-    __flush(buffer)
+    __handle_flush_event(buffer)
   end
 
   # Private
@@ -75,10 +75,10 @@ defmodule Buffered.Queue do
     end
   end
 
-  defp __flush(%Buffer{} = buffer) do
+  defp __handle_flush_event(%Buffer{} = buffer) do
     buffer.items
     |> Enum.chunk_every(buffer.size)
-    |> Enum.each(buffer.flush)
+    |> Enum.each(buffer.flush_callback)
 
     {:next_state, :empty, %Buffer{buffer | items: [], filled: 0}}
   end
