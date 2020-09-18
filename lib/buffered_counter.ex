@@ -6,11 +6,15 @@ defmodule BufferedCounter do
   end
 
   # Interface
-  def start_link(starting_number, threshold, timeout, flush_callback, opts \\ []) do
+  def start_link(
+        %{start: start, threshold: threshold, timeout: timeout},
+        flush_callback,
+        opts \\ []
+      ) do
     :gen_statem.start_link(
       __MODULE__,
       %Counter{
-        number: starting_number,
+        number: start,
         threshold: threshold,
         timeout: timeout,
         flush_callback: flush_callback

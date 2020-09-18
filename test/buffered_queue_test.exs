@@ -3,7 +3,9 @@ defmodule BufferedQueueTest do
 
   setup do
     this = self()
-    {:ok, pid} = BufferedQueue.start_link(2, 100, fn items -> send(this, items) end)
+
+    {:ok, pid} =
+      BufferedQueue.start_link(%{size: 2, timeout: 100}, fn items -> send(this, items) end)
 
     {:ok, %{pid: pid}}
   end

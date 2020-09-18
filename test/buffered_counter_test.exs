@@ -3,7 +3,11 @@ defmodule BufferedCounterTest do
 
   setup do
     this = self()
-    {:ok, pid} = BufferedCounter.start_link(100, 10, 100, fn n -> send(this, n) end)
+
+    {:ok, pid} =
+      BufferedCounter.start_link(%{start: 100, threshold: 10, timeout: 100}, fn n ->
+        send(this, n)
+      end)
 
     {:ok, %{pid: pid}}
   end

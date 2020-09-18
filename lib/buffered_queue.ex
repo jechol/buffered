@@ -6,7 +6,7 @@ defmodule BufferedQueue do
   end
 
   # Interface
-  def start_link(size, timeout, flush_callback, opts \\ []) do
+  def start_link(%{size: size, timeout: timeout}, flush_callback, opts \\ []) do
     :gen_statem.start_link(
       __MODULE__,
       %Buffer{size: size, timeout: timeout, flush_callback: flush_callback},
