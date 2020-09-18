@@ -1,11 +1,12 @@
-defmodule BufferedCounterTest do
+defmodule Buffered.CounterTest do
   use ExUnit.Case, async: true
+  alias Buffered.Counter
 
   setup do
     this = self()
 
     {:ok, pid} =
-      BufferedCounter.start_link(%{start: 100, threshold: 10, timeout: 100}, fn n ->
+      Counter.start_link(%{start: 100, threshold: 10, timeout: 100}, fn n ->
         send(this, n)
       end)
 
@@ -13,25 +14,25 @@ defmodule BufferedCounterTest do
   end
 
   test "idle -> idle", %{pid: pid} do
-    BufferedCounter.add(pid, 11)
+    Counter.add(pid, 11)
     assert_receive(111)
   end
 
   test "idle -> idle for negative", %{pid: pid} do
-    BufferedCounter.add(pid, -11)
+    Counter.add(pid, -11)
     assert_receive(89)
   end
 
   test "idle -> buffering -> idle", %{pid: pid} do
-    BufferedCounter.add(pid, 9)
-    BufferedCounter.add(pid, 2)
+    Counter.add(pid, 9)
+    Counter.add(pid, 2)
 
     refute_receive(109)
     assert_receive(111)
   end
 
   test "idle -> buffering -> timeout", %{pid: pid} do
-    BufferedCounter.add(pid, 9)
+    Counter.add(pid, 9)
     refute_receive(109)
 
     Process.sleep(100)
@@ -39,15 +40,15 @@ defmodule BufferedCounterTest do
   end
 
   test "flush on idle", %{pid: pid} do
-    BufferedCounter.flush(pid)
+    Counter.flush(pid)
     assert_receive(100)
   end
 
   test "flush on buffering", %{pid: pid} do
-    BufferedCounter.add(pid, 9)
+    Counter.add(pid, 9)
     refute_receive(109)
 
-    BufferedCounter.flush(pid)
+    Counter.flush(pid)
     assert_receive(109)
   end
 end

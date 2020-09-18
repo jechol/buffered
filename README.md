@@ -1,6 +1,6 @@
 # Buffered
 
-Buffered Queue and Counter for Erlang/Elixir
+Buffered queue and counter for Erlang/Elixir
 
 ## Installation
 
@@ -15,38 +15,42 @@ def deps do
 end
 ```
 
-## BufferedCounter
+## Usage
+
+### BufferedCounter
 
 ```elixir
-{:ok, pid} = BufferedCounter.start_link(%{start: 100, threshold: 10, timeout: 5000}, &IO.inspect/1)
+alias Buffered.Counter
+{:ok, pid} = Counter.start_link(%{start: 100, threshold: 10, timeout: 5000}, &IO.inspect/1)
 
-BufferedCounter.add(pid, 9)
-BufferedCounter.add(pid, 2)
+Counter.add(pid, 9)
+Counter.add(pid, 2)
 # 111 immediately due to threshold
 
-BufferedCounter.add(pid, 2)
+Counter.add(pid, 2)
 Process.sleep(5000)
 # 113 after 5s due to timeout
 
-BufferedCounter.add(pid, -8)
-BufferedCounter.flush(pid)
+Counter.add(pid, -8)
+Counter.flush(pid)
 # 105 due to flush
 ```
 
-## BufferedQueue
+### Queue
 
 ```elixir
-{:ok, pid} = BufferedQueue.start_link(%{size: 2, timeout: 5000}, &IO.inspect/1)
+alias Buffered.Queue
+{:ok, pid} = Queue.start_link(%{size: 2, timeout: 5000}, &IO.inspect/1)
 
-BufferedQueue.enqueue(pid, [1])
-BufferedQueue.enqueue(pid, [2, 3])
+Queue.enqueue(pid, [1])
+Queue.enqueue(pid, [2, 3])
 # [1, 2, 3] immediately due to size
 
-BufferedQueue.enqueue(pid, [4])
+Queue.enqueue(pid, [4])
 Process.sleep(5000)
 # [4] after 5s due to timeout
 
-BufferedQueue.enqueue(pid, [5])
-BufferedQueue.flush(pid)
+Queue.enqueue(pid, [5])
+Queue.flush(pid)
 # [5] due to flush
 ```
