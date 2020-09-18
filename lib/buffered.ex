@@ -79,8 +79,7 @@ defmodule Buffered do
            reset: reset
          } = data,
          new_item
-       )
-       when is_list(new_item) do
+       ) do
     new_private = append.(private, new_item)
 
     if overflow?.(new_private, threshold) do
