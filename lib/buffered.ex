@@ -6,7 +6,7 @@ defmodule Buffered do
               threshold: 0,
               timeout: 0,
               private: %{},
-              flush_cb: nil,
+              output_cb: nil,
               # (private, item) -> private
               append: nil,
               # private -> boolean
@@ -48,7 +48,7 @@ defmodule Buffered do
       data
       |> __append(new_item)
 
-    flush_list |> Enum.each(data.flush_cb)
+    flush_list |> Enum.each(data.output_cb)
     {:next_state, next_state, new_data, {:reply, from, :ok}}
   end
 
@@ -89,9 +89,9 @@ defmodule Buffered do
     end
   end
 
-  defp __handle_flush_event(%Data{private: private, reset: reset, flush_cb: flush_cb} = data) do
+  defp __handle_flush_event(%Data{private: private, reset: reset, output_cb: output_cb} = data) do
     {reset_private, flush_list} = reset.(private)
-    flush_list |> Enum.each(flush_cb)
+    flush_list |> Enum.each(output_cb)
 
     {:next_state, :idle, %Data{data | private: reset_private}}
   end

@@ -3,13 +3,13 @@ defmodule Buffered.Queue do
     defstruct items: [], filled: 0
   end
 
-  def start_link(%{size: threshold, timeout: timeout}, flush_cb, opts \\ []) do
+  def start_link(%{size: threshold, timeout: timeout}, output_cb, opts \\ []) do
     Buffered.start_link(
       %Buffered.Data{
         identity: [],
         threshold: threshold,
         timeout: timeout,
-        flush_cb: flush_cb,
+        output_cb: output_cb,
         private: %Private{
           items: [],
           filled: 0
