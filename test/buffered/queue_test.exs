@@ -14,22 +14,22 @@ defmodule Buffered.QueueTest do
   end
 
   test "idle -> idle", %{pid: pid} do
-    Queue.enqueue(pid, [1, 2, 3])
+    :ok = Queue.enqueue(pid, [1, 2, 3])
     assert_receive([1, 2, 3])
   end
 
   test "idle -> buffering -> idle", %{pid: pid} do
-    Queue.enqueue(pid, [1])
-    Queue.enqueue(pid, [2, 3])
+    :ok = Queue.enqueue(pid, [1])
+    :ok = Queue.enqueue(pid, [2, 3])
 
     refute_receive([1])
     assert_receive([1, 2, 3])
   end
 
   test "idle -> buffering -> idle -> idle", %{pid: pid} do
-    Queue.enqueue(pid, [1])
-    Queue.enqueue(pid, [2, 3])
-    Queue.enqueue(pid, [4, 5])
+    :ok = Queue.enqueue(pid, [1])
+    :ok = Queue.enqueue(pid, [2, 3])
+    :ok = Queue.enqueue(pid, [4, 5])
 
     refute_receive([1])
     assert_receive([1, 2, 3])
@@ -37,26 +37,26 @@ defmodule Buffered.QueueTest do
   end
 
   test "idle -> buffering -> timeout -> idle", %{pid: pid} do
-    Queue.enqueue(pid, [1])
+    :ok = Queue.enqueue(pid, [1])
     refute_receive([1])
 
     Process.sleep(@timeout)
     assert_receive([1])
 
-    Queue.enqueue(pid, [4, 5])
+    :ok = Queue.enqueue(pid, [4, 5])
     assert_receive([4, 5])
   end
 
   test "flush on idle", %{pid: pid} do
-    Queue.flush(pid)
+    :ok = Queue.flush(pid)
     assert_receive([])
   end
 
   test "flush on buffering", %{pid: pid} do
-    Queue.enqueue(pid, [1])
+    :ok = Queue.enqueue(pid, [1])
     refute_receive([1])
 
-    Queue.flush(pid)
+    :ok = Queue.flush(pid)
     assert_receive([1])
   end
 end

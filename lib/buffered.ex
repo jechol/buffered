@@ -17,7 +17,9 @@ defmodule Buffered do
 
   # Interface
   def start_link(%Data{} = data, opts \\ []) do
-    :gen_statem.start_link(__MODULE__, data, opts)
+    {:ok, pid} = :gen_statem.start_link(__MODULE__, data, opts)
+    flush(pid)
+    {:ok, pid}
   end
 
   def append(pid, new_item) do

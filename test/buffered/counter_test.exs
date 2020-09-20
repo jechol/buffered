@@ -12,29 +12,31 @@ defmodule Buffered.CounterTest do
         send(this, n)
       end)
 
+    assert_received(100)
+
     {:ok, %{pid: pid}}
   end
 
   test "idle -> idle", %{pid: pid} do
-    Counter.add(pid, 11)
+    :ok = Counter.add(pid, 11)
     assert_receive(111)
   end
 
   test "idle -> idle for negative", %{pid: pid} do
-    Counter.add(pid, -11)
+    :ok = Counter.add(pid, -11)
     assert_receive(89)
   end
 
   test "idle -> buffering -> idle", %{pid: pid} do
-    Counter.add(pid, 9)
-    Counter.add(pid, 2)
+    :ok = Counter.add(pid, 9)
+    :ok = Counter.add(pid, 2)
 
     refute_receive(109)
     assert_receive(111)
   end
 
   test "idle -> buffering -> timeout", %{pid: pid} do
-    Counter.add(pid, 9)
+    :ok = Counter.add(pid, 9)
     refute_receive(109)
 
     Process.sleep(@timeout)
@@ -42,15 +44,15 @@ defmodule Buffered.CounterTest do
   end
 
   test "flush on idle", %{pid: pid} do
-    Counter.flush(pid)
+    :ok = Counter.flush(pid)
     assert_receive(100)
   end
 
   test "flush on buffering", %{pid: pid} do
-    Counter.add(pid, 9)
+    :ok = Counter.add(pid, 9)
     refute_receive(109)
 
-    Counter.flush(pid)
+    :ok = Counter.flush(pid)
     assert_receive(109)
   end
 end
